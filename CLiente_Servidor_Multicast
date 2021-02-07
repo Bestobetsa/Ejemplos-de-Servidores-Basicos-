@@ -1,0 +1,89 @@
+/*Aqui va primero el Servidor y luego el codigo del cliente, estsos deben estar en dos archivos, separados para compilar y ejecutar.
+en este caso primero se ejecuta el servidor y luego el cliente, como es java para compilar esto por terminal se debe descargar el open-jdk version 8 en adelante
+y usar en la linea de comandos o terminal en la carpeta donde se encuentre nuesto(s) archivos a compilar:
+javac fileName.java
+java fileName
+*/
+
+/*Codigo Servidor*/
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.nio.ByteBuffer;
+
+public class ServidorMulticast
+{
+  static void envia_mensaje(byte[] buffer,String ip,int puerto) throws IOException
+  {
+    DatagramSocket socket = new DatagramSocket();
+    InetAddress grupo = InetAddress.getByName(ip);
+    DatagramPacket paquete = new DatagramPacket(buffer,buffer.length,grupo,puerto);
+    socket.send(paquete);
+    socket.close();
+  }
+
+  public static void main(String[] args) throws Exception
+  {
+    /* envia una string */
+    envia_mensaje("hola".getBytes(),"230.0.0.0",50000);
+
+    /* envia 5 doubles */
+    ByteBuffer b = ByteBuffer.allocate(5*8);
+    b.putDouble(1.1);
+    b.putDouble(1.2);
+    b.putDouble(1.3);
+    b.putDouble(1.4);
+    b.putDouble(1.5);
+    envia_mensaje(b.array(),"230.0.0.0",50000);
+  }
+}
+
+/*Codigo Cliente*/
+
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.nio.ByteBuffer;
+import java.net.DatagramSocket;
+
+public class ClienteMulticast
+{
+  static byte[] recibe_mensaje(MulticastSocket socket,int longitud) throws IOException
+  {
+    byte[] buffer = new byte[longitud];
+    DatagramPacket paquete = new DatagramPacket(buffer,buffer.length);
+    socket.receive(paquete);
+    return buffer;
+  }
+  static void envia_mensaje(byte[] buffer,String ip,int puerto) throws IOException
+  {
+    DatagramSocket socket = new DatagramSocket();
+    InetAddress grupo = InetAddress.getByName(ip);
+    DatagramPacket paquete = new DatagramPacket(buffer,buffer.length,grupo,puerto);
+    socket.send(paquete);
+    socket.close();
+  }
+
+  public static void main(String[] args) throws Exception
+  {
+    InetAddress grupo = InetAddress.getByName("230.0.0.0");
+    MulticastSocket socket = new MulticastSocket(10000);
+    socket.joinGroup(grupo);
+
+    System.out.println("Esperando datagrama...");
+
+    //Enviar 1 como entero de 32 bits
+    ByteBuffer b=;
+    //Enviar 20 como entero de 32 bits
+    ByteBuffer b=;
+    //Enviar 200.0 como flotante de 64 bits (double)
+    ByteBuffer b=;
+    //Recibe un entero de 32 bits
+    byte[] buffer= recibe_mensaje(socket,8);
+    ByteBuffer b = ByteBuffer.wrap(buffer);
+
+
+  }
+}
